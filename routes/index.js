@@ -1,8 +1,8 @@
-const AppController = {
-  getStatus: (req, res) => {
-    res.send("status");
-  },
-  getStats: (res, req) => {
-    res.send("stats");
-  },
-};
+import { Router } from 'express';
+
+const AppController = require('../controllers/AppController');
+
+const router = new Router();
+
+router.get('/status', AppController.getStatus);
+router.get('/stats', AppController.getStats);
