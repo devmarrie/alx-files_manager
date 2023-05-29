@@ -5,32 +5,32 @@ class DBClient {
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || 27017;
     const database = process.env.DB_DATABASE || 'files_manager';
-    const url = `mongodb://${host}:${port}/${database}`;
+    const url = `mongodb://${host}:${port}`;
 
     this.clientdb = new MongoClient(url);
-    this.db = null;
+    this.clientdb.connect().then(() => {
+      this.db = this.clientdb.db(`${database}`);
+    }).catch((error) => {
+      console.log(error);
+    });
   }
 
   isAlive() {
-    try {
-      this.clientdb.connect();
-      this.db = this.clientdb.db();
-      return true;
-    } catch (error) {
-      console.log(`Failed to connect ${error}`);
-      return false;
-    }
+    return this.clientdb.isConnected();
+    // try {
+    //   await this.clientdb.connect();
+    //   this.db = this.clientdb.db();
+    //   console.log(`connected to ${this.db}`);
+    //   return true;
+    // } catch (error) {
+    //   console.log(`Failed to connect ${error}`);
+    //   return false;
   }
 
   async nbUsers() {
-    try {
-      const collection = this.db.collection('users');
-      const count = await collection.countDocuments();
-      return count;
-    } catch (error) {
-      console.log(`No documents found ${error}`);
-      return -1;
-    }
+    const collection = this.db.collection('users');
+    const count = await collection.countDocuments();
+    return count;
   }
 
   async nbFiles() {
