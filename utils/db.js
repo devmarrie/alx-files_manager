@@ -8,11 +8,17 @@ class DBClient {
     const url = `mongodb://${host}:${port}/${database}`;
 
     this.clientdb = new MongoClient(url);
+    this.db = null;
   }
 
   isAlive() {
-    this.clientdb.connect();
-    return true;
+    try {
+      this.clientdb.connect();
+      return true;
+    } catch (error) {
+      console.log(`Failed to connect ${error}`);
+      return false;
+    }
   }
 }
 
