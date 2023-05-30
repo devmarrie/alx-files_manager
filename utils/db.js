@@ -7,9 +7,9 @@ const url = `mongodb://${HOST}:${PORT}`;
 
 class DBClient {
   constructor() {
-    this.clientdb = new MongoClient(url, { useUnifiedTopology: true });
-    this.clientdb.connect().then(() => {
-      this.db = this.clientdb.db(`${DATABASE}`);
+    this.client = new MongoClient(url, { useUnifiedTopology: true });
+    this.client.connect().then(() => {
+      this.db = this.client.db(`${DATABASE}`);
     }).catch((err) => {
       console.log(err);
     });
@@ -17,26 +17,18 @@ class DBClient {
 
   isAlive() {
     return this.client.isConnected();
-    // try {
-    //   await this.clientdb.connect();
-    //   this.db = this.clientdb.db();
-    //   console.log(`connected to ${this.db}`);
-    //   return true;
-    // } catch (error) {
-    //   console.log(`Failed to connect ${error}`);
-    //   return false;
   }
 
   async nbUsers() {
-    const collection = this.db.collection('users');
-    const count = await collection.countDocuments();
-    return count;
+    const coll = this.db.collection('users');
+    const usersCount = await coll.countDocuments();
+    return usersCount;
   }
 
   async nbFiles() {
-    const collection = this.db.collection('files');
-    const count = await collection.countDocuments();
-    return count;
+    const fcol = this.db.collection('files');
+    const filesCount = await fcol.countDocuments();
+    return filesCount;
   }
 }
 
