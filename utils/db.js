@@ -30,6 +30,12 @@ class DBClient {
     const filesCount = await fcol.countDocuments();
     return filesCount;
   }
+
+  async newUser(email, pass) {
+    const table = this.db.collection('users');
+    const usr = await table.insertOne({ email, pass });
+    return usr.ops[0];
+  }
 }
 
 const dbClient = new DBClient();
