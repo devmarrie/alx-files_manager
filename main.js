@@ -25,5 +25,6 @@ const waitConnection = () => {
   console.log(dbClient.isAlive());
   console.log(await dbClient.nbUsers());
   console.log(await dbClient.nbFiles());
-  console.log(await dbClient.newUser('akeyo@gmail.com', 'pass123'));
+  console.log(await dbClient.newUser('tiny@gmail.com', 'tiny321'));
+  console.log(await dbClient.findUser('john@doe.com'));
 })();
