@@ -12,7 +12,7 @@ class AppController {
     const userstt = await dbClient.nbUsers();
     const filestt = await dbClient.nbFiles();
     res.status(200)
-      .json({ users: userstt, files: filestt});
+      .json({ users: userstt, files: filestt });
   }
 }
 module.exports = AppController;
