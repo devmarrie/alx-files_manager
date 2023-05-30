@@ -16,10 +16,7 @@ class DBClient {
   }
 
   isAlive() {
-    if (this.db) {
-      // console.log('successfull');
-    }
-    return true;
+    return this.client && this.client.isConnected();
     // try {
     //   await this.clientdb.connect();
     //   this.db = this.clientdb.db();
