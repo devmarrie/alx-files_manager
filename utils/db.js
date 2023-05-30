@@ -12,15 +12,17 @@ class DBClient {
     this.status = false;
   }
 
- 
-
-  isAlive() {
-    this.clientdb.connect().then(() => {
+  async conn() {
+    try {
+      await this.clientdb.connect();
       this.status = true;
       console.log('connected to mongodb');
-    }).catch((err) => {
-      console.log(err);
-    });
+    } catch (error) {
+      console.log(`Error ${error}`);
+    }
+  }
+
+  isAlive() {
     return this.status;
     // try {
     //   await this.clientdb.connect();
