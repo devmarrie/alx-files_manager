@@ -1,6 +1,5 @@
-import 
-class UsersController {
+const UsersController = {
 
-}
+};
 
 module.exports = UsersController;
