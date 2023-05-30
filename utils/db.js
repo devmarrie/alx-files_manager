@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb');
+const crypto = require('crypto');
 
 const HOST = process.env.DB_HOST || 'localhost';
 const PORT = process.env.DB_PORT || 27017;
@@ -33,8 +34,16 @@ class DBClient {
 
   async newUser(email, pass) {
     const table = this.db.collection('users');
-    const usr = await table.insertOne({ email, pass });
+    const sha1Hash = crypto.createHash('sha1');
+    const hashed = sha1Hash.update(pass).digest('hex');
+    const usr = await table.insertOne({ email, password: hashed });
     return usr.ops[0];
+  }
+
+  async findUser(mail) {
+    const table = this.db.collection('users');
+    const found = await table.find({ email: mail }).toArray();
+    return found[0];
   }
 }
 
