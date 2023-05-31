@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectID } = require('mongodb');
 const crypto = require('crypto');
 
 const HOST = process.env.DB_HOST || 'localhost';
@@ -44,6 +44,14 @@ class DBClient {
     const table = this.db.collection('users');
     const found = await table.find({ email: mail }).toArray();
     return found[0];
+  }
+
+  async userByid(id) {
+    const table = this.db.collection('users');
+    // convert user id into an object id
+    const userId = new ObjectID(id);
+    const found = await table.findOne({ _id: userId });
+    return found;
   }
 }
 
