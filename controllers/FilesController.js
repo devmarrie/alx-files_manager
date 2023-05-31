@@ -12,48 +12,61 @@ const FilesController = {
     if (id == null) {
       res.status(401).json({ error: 'Unauthorized' });
     }
+    console.log(id);
     const { name, type, data } = req.body;
     const isPublic = req.body.isPublic || false;
     const parentId = req.body.parentId || 0;
 
     if (!name) {
       res.status(400).json({ error: 'Missing name' });
-    } else if (!type) {
+    }
+    if (!type) {
       res.status(400).json({ error: 'Missing type' });
-    } else if (!data && type !== 'folder') {
+    }
+    if (!data && type !== 'folder') {
       res.status(400).json({ error: 'Missing data' });
     }
+    // console.log(name, type, data);
+    // console.log(checkParent);
     if (parentId !== 0) {
       const checkParent = await dbClient.fileByParentId(parentId);
-      // res.status(200).json({ checkParent });
       if (!checkParent) {
         res.status(400).json({ error: 'Parent not found' }).end();
       } else if (checkParent.type !== 'folder') {
         res.status(400).json({ error: 'Parent is not a folder' }).end();
       } else {
-        res.status(200).json({ checkParent });
+        const pId = checkParent._id;
+        const folderToDb = await dbClient.createFolder(id, name, 'folder', isPublic, pId);
+        res.status(201).json(folderToDb);
       }
-    }
-    if (type === 'folder') {
+    } else {
       const folderToDb = await dbClient.createFolder(id, name, 'folder', isPublic, parentId);
-      res.status(201).json({ folderToDb });
+      res.status(201).json(folderToDb);
     }
+    // if (type === 'folder') {
+    //   const folderToDb = await dbClient.createFolder(id, name, 'folder', isPublic, parentId);
+    //   res.status(201).json({ folderToDb });
+    // }
     if (type === 'file' || type === 'image') {
       const filePath = process.env.FOLDER_PATH || '/tmp/files_manager';
+      // console.log(filePath);
       const fileName = `${filePath}/${uuidv4()}`;
+      // console.log(fileName);
       const base64String = Buffer.from(data).toString('base64');
+      console.log(`base64String ${base64String}`);
       try {
         try {
           await fs.mkdir(filePath);
         } catch (error) {
           // pass. Error raised when file already exists
         }
-        await fs.writeFile(fileName, base64String, 'utf-8');
+        await fs.writeFile(fileName, data, 'utf-8');
       } catch (error) {
         console.log(error);
       }
-      await dbClient.createFile(id, name, type, isPublic, parentId, fileName);
-      res.status(201).json({});
+      const dataFinal = await dbClient.createFile(id, name, type, isPublic, parentId, fileName);
+      // console.log(dataFinal);
+      res.status(201).json(dataFinal);
     }
   },
 };
