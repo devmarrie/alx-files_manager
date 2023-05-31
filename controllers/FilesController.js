@@ -60,6 +60,33 @@ const FilesController = {
       res.status(201).json(dataFinal);
     }
   },
+  async getShow(req, res) {
+    const token = req.header('X-Token');
+    const key = `auth_${token}`;
+    const id = await redisClient.get(key);
+    if (id == null) {
+      res.status(401).json({ error: 'Unauthorized' });
+    }
+    const fechtFile = await dbClient.fileBasedOnUid(id);
+    if (fechtFile !== null) {
+      res.status(201).json(fechtFile);
+    } else {
+      res.status(404).json({ error: 'Not found' });
+    }
+  },
+  async getIndex(req, res) {
+    const token = req.header('X-Token');
+    const key = `auth_${token}`;
+    const id = await redisClient.get(key);
+    if (id == null) {
+      res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { page } = req.body || 0;
+    const { parentId } = req.body || 0;
+    if (parentId) {
+      const userFiles = await dbClient.ManyBasedOnUid(id);
+    }
+  }
 };
 
 module.exports = FilesController;
