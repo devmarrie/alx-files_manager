@@ -33,7 +33,13 @@ const waitConnection = () => {
   // const base64String = Buffer.from('kenny@gmail.com:ken321').toString('base64');
   // console.log(base64String);
   // console.log(await dbClient.fileById('6477a1631de1715315089819'));
-  console.log(await dbClient.fileBasedOnUid('6477052184d2084a4a087dbe'));
+  // console.log(await dbClient.fileBasedOnUid('6477052184d2084a4a087dbe'));
+  const pipeline = [
+    { $sort: { parentId: 1 } },
+    { $skip: 1 * 20 },
+    { $limit: 20 },
+  ];
+  console.log(await dbClient.paginate(pipeline));
 })();
 // a2VubnlAZ21haWwuY29tOmtlbjMyMQ==
 // e10ea04f-04a3-4266-b7e8-198d95775177
