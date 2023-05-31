@@ -28,6 +28,8 @@ const waitConnection = () => {
   // console.log(await dbClient.newUser('kenny@gmail.com', 'ken321'));
   console.log(await dbClient.findUser('john@doe.com'));
   console.log(await dbClient.userByid('6477052496fe7a4a7a8189b6'));
-  const base64String = Buffer.from('kenny@gmail.com:ken321').toString('base64');
-  console.log(base64String);
+  // console.log(await dbClient.delFile('python.txt'));
+  // console.log(await dbClient.createFile('6477052496fe7a4a7a8189b6', 'java.txt', 'file', true, 0, '/tmp/files_manager'));
+  // const base64String = Buffer.from('kenny@gmail.com:ken321').toString('base64');
+  console.log(await dbClient.fileByParentId('64774bef89b871f4938abc09'));
 })();
