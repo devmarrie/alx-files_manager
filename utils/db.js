@@ -71,10 +71,31 @@ class DBClient {
     return newFolder.ops[0];
   }
 
+  async fileById(id) {
+    const table = this.db.collection('files');
+    const fileId = new ObjectID(id);
+    const publicFile = await table.findOne({ _id: fileId });
+    return publicFile;
+  }
+
   async fileByParentId(parentId) {
     const table = this.db.collection('files');
     const fid = new ObjectID(parentId);
     const file = await table.findOne({ _id: fid });
+    return file;
+  }
+
+  async fileBasedOnUid(usrId) {
+    const table = this.db.collection('files');
+    // const uId = new ObjectID(usrId);
+    const file = await table.findOne({ userId: usrId });
+    return file;
+  }
+
+  async ManyBasedOnUid(usId) {
+    const table = this.db.collection('files');
+    // const uId = new ObjectID(usrId);
+    const file = await table.find({ userId: usId }).toArray();
     return file;
   }
 
