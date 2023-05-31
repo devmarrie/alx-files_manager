@@ -28,4 +28,6 @@ const waitConnection = () => {
   // console.log(await dbClient.newUser('kenny@gmail.com', 'ken321'));
   console.log(await dbClient.findUser('john@doe.com'));
   console.log(await dbClient.userByid('6477052496fe7a4a7a8189b6'));
+  const base64String = Buffer.from('kenny@gmail.com:ken321').toString('base64');
+  console.log(base64String);
 })();
