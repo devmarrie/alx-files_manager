@@ -12,7 +12,6 @@ const FilesController = {
     if (id == null) {
       res.status(401).json({ error: 'Unauthorized' });
     }
-    console.log(id);
     const { name, type, data } = req.body;
     const isPublic = req.body.isPublic || false;
     const parentId = req.body.parentId || 0;
@@ -26,8 +25,7 @@ const FilesController = {
     if (!data && type !== 'folder') {
       res.status(400).json({ error: 'Missing data' });
     }
-    // console.log(name, type, data);
-    // console.log(checkParent);
+
     if (parentId !== 0) {
       const checkParent = await dbClient.fileByParentId(parentId);
       if (!checkParent) {
@@ -43,15 +41,9 @@ const FilesController = {
       const folderToDb = await dbClient.createFolder(id, name, 'folder', isPublic, parentId);
       res.status(201).json(folderToDb);
     }
-    // if (type === 'folder') {
-    //   const folderToDb = await dbClient.createFolder(id, name, 'folder', isPublic, parentId);
-    //   res.status(201).json({ folderToDb });
-    // }
     if (type === 'file' || type === 'image') {
       const filePath = process.env.FOLDER_PATH || '/tmp/files_manager';
-      // console.log(filePath);
       const fileName = `${filePath}/${uuidv4()}`;
-      // console.log(fileName);
       const base64String = Buffer.from(data).toString('base64');
       console.log(`base64String ${base64String}`);
       try {
@@ -65,7 +57,6 @@ const FilesController = {
         console.log(error);
       }
       const dataFinal = await dbClient.createFile(id, name, type, isPublic, parentId, fileName);
-      // console.log(dataFinal);
       res.status(201).json(dataFinal);
     }
   },
