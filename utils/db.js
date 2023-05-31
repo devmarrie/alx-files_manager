@@ -99,6 +99,12 @@ class DBClient {
     return file;
   }
 
+  async paginate(pipeline) {
+    const table = this.db.collection('files');
+    const paged = await table.aggregate(pipeline).toArray();
+    return paged;
+  }
+
   async delFile(name) {
     const table = this.db.collection('files');
     await table.deleteOne({ name });
