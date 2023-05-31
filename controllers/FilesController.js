@@ -61,12 +61,7 @@ const FilesController = {
     }
   },
   async getShow(req, res) {
-    const token = req.header('X-Token');
-    const key = `auth_${token}`;
-    const id = await redisClient.get(key);
-    if (id == null) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
+    const { id } = req.params;
     const fechtFile = await dbClient.fileBasedOnUid(id);
     if (fechtFile !== null) {
       res.status(201).json(fechtFile);
@@ -83,10 +78,16 @@ const FilesController = {
     }
     const { page } = req.body || 0;
     const { parentId } = req.body || 0;
-    if (parentId) {
-      const userFiles = await dbClient.ManyBasedOnUid(id);
-    }
-  }
+    const pagesize = 20;
+
+    const pipeline = [
+      { $sort: { parentId: 1 } },
+      { $skip: 1 * pagesize },
+      { $limit: pagesize },
+    ];
+    const userFiles = await dbClient.paginate(pipeline);
+    res.status(201).json(userFiles);
+  },
 };
 
 module.exports = FilesController;
