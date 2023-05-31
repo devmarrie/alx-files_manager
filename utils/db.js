@@ -53,6 +53,35 @@ class DBClient {
     const found = await table.findOne({ _id: userId });
     return found;
   }
+
+  // Files methods
+  async createFile(userId, name, type, isPublic, parentId, localPath) {
+    const table = this.db.collection('files');
+    const newFile = await table.insertOne({
+      userId, name, type, isPublic, parentId, localPath,
+    });
+    return newFile.ops[0];
+  }
+
+  async createFolder(userId, name, type, isPublic, parentId) {
+    const table = this.db.collection('files');
+    const newFolder = await table.insertOne({
+      userId, name, type, isPublic, parentId,
+    });
+    return newFolder.ops[0];
+  }
+
+  async fileByParentId(parentId) {
+    const table = this.db.collection('files');
+    const fid = new ObjectID(parentId);
+    const file = await table.findOne({ _id: fid });
+    return file;
+  }
+
+  async delFile(name) {
+    const table = this.db.collection('files');
+    await table.deleteOne({ name });
+  }
 }
 
 const dbClient = new DBClient();
