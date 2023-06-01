@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import mime from 'mime-types';
 import { promises as fs } from 'fs';
 
+const { ObjectID } = require('mongodb');
 const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
 
@@ -102,7 +103,8 @@ const FilesController = {
     if (id == null) {
       res.status(401).json({ error: 'Unauthorized' });
     } else {
-      const userFile = await dbClient.updateFile(id);
+      const uId = new ObjectID(id);
+      const userFile = await dbClient.updateFile(uId);
       if (!userFile) {
         res.status(401).json({ error: 'Not found' });
       } else {
@@ -117,7 +119,7 @@ const FilesController = {
     if (id == null) {
       res.status(401).json({ error: 'Unauthorized' });
     } else {
-      const userFile = await dbClient.updateToFalse (id);
+      const userFile = await dbClient.updateToFalse(id);
       if (!userFile) {
         res.status(401).json({ error: 'Not found' });
       } else {
