@@ -105,6 +105,20 @@ class DBClient {
     return paged;
   }
 
+  async updateFile(fileId) {
+    const table = this.db.collection('files');
+    const filter = { _id: fileId };
+    const update = { $set: { isPublic: true } };
+    await table.updateOne(filter, update);
+  }
+
+  async updateToFalse(fileId) {
+    const table = this.db.collection('files');
+    const filter = { _id: fileId };
+    const update = { $set: { isPublic: false } };
+    await table.updateOne(filter, update);
+  }
+
   async delFile(name) {
     const table = this.db.collection('files');
     await table.deleteOne({ name });
