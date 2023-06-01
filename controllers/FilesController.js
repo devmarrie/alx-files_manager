@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import mime from 'mime-types';
 import { promises as fs } from 'fs';
 
+const Queue = require('bull');
+
+const fileQueue = new Queue('fileQueue', 'redis://127:0.0.1:6379');
 const { ObjectID } = require('mongodb');
 const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
@@ -47,6 +50,8 @@ const FilesController = {
       const filePath = process.env.FOLDER_PATH || '/tmp/files_manager';
       const fileName = `${filePath}/${uuidv4()}`;
       const base64String = Buffer.from(data).toString('base64');
+      const fileId = await dbClient.fileBasedOnUid(id);
+      const theFile = fileId._id;
       console.log(`base64String ${base64String}`);
       try {
         try {
@@ -57,6 +62,14 @@ const FilesController = {
         await fs.writeFile(fileName, data, 'utf-8');
       } catch (error) {
         console.log(error);
+      }
+      if (type === 'image') {
+        fileQueue.add(
+          {
+            userId: id,
+            fileId: theFile,
+          },
+        );
       }
       const dataFinal = await dbClient.createFile(id, name, type, isPublic, parentId, fileName);
       res.status(201).json(dataFinal);
@@ -130,11 +143,14 @@ const FilesController = {
 
   async getFile(req, res) {
     const { id } = req.params;
+    const { size } = req.params;
     const doc = dbClient.fileById(id);
+    const pathTo = doc.localPath;
+
     if (!doc) {
       res.status(404).json({ error: 'Not found' });
     }
-    if (!doc.isPublic === false && !doc.parentId) {
+    if (doc.isPublic === false && !doc.parentId) {
       res.status(404).json({ error: 'Not found' });
     }
     if (doc.type === 'folder') {
@@ -142,6 +158,9 @@ const FilesController = {
     }
     if (!doc.localPath) {
       res.status(404).json({ error: 'Not found' });
+    }
+    if (size) {
+      pathTo = `${doc.localPath}_${size}`;
     }
     const contentType = mime.contentType(doc.name);
     return res.header('Content-Type', contentType).status(200).sendFile(doc);
