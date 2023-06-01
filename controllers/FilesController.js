@@ -62,9 +62,14 @@ const FilesController = {
     }
   },
   async getShow(req, res) {
-    const { id } = req.params;
-    const fechtFile = await dbClient.fileBasedOnUid(id);
-    if (fechtFile !== null) {
+    const token = req.header('X-Token');
+    const key = `auth_${token}`;
+    const redisId = await redisClient.get(key);
+    if (redisId == null) {
+      res.status(401).json({ error: 'Unauthorized' });
+    }
+    const fechtFile = await dbClient.fileBasedOnUid(redisId);
+    if (fechtFile) {
       res.status(201).json(fechtFile);
     } else {
       res.status(404).json({ error: 'Not found' });
@@ -77,14 +82,15 @@ const FilesController = {
     if (id == null) {
       res.status(401).json({ error: 'Unauthorized' });
     }
-    const { page } = req.body || 0;
-    const { parentId } = req.body || 0;
-    const pagesize = 20;
+    const page = parseInt(req.query.page, 10) || 0;
+    const parentId = parseInt(req.query.parentId, 10) || 0;
+    const PAGE_SIZE = 20;
 
     const pipeline = [
-      { $sort: { parentId: 1 } },
-      { $skip: 1 * pagesize },
-      { $limit: pagesize },
+      { $match: { parentId } }, // Match documents based on parentId (if applicable)
+      { $sort: { _id: 1 } }, // Sort by any field (in this case, _id) for consistent results
+      { $skip: page * PAGE_SIZE }, // Skip documents based on page number
+      { $limit: PAGE_SIZE }, // Limit the number of documents per page
     ];
     const userFiles = await dbClient.paginate(pipeline);
     res.status(201).json(userFiles);
